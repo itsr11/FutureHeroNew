@@ -1,0 +1,59 @@
+# Filament Resource Structure Plan
+
+## Overview
+The Admin Panel will manage Users, Learning Content (Classes/Courses), and AI Assessment Data.
+
+## 1. User Management
+### Resources
+- **UserResource**: Standard user management.
+    - **Fields**: Name, Email, Role (Enum: Admin, Teacher, Student), Avatar.
+    - **Relations**: `hasMany` Classes (as Teacher), `hasMany` Enrollments (as Student).
+- **RoleResource** (Optional if using Spatie Permission): To manage granular permissions.
+
+## 2. Learning Management System (LMS)
+### Resources
+- **ClassResource** (or CourseResource):
+    - **Fields**: 
+        - Title (Text)
+        - Slug (Text, Auto-generated)
+        - Description (RichEditor)
+        - Thumbnail (ImageUpload)
+        - Price (Money, Nullable for Free)
+        - Status (Select: Draft, Published, Archived)
+        - Level (Select: Beginner, Intermediate, Advanced)
+    - **Relations**: `belongsTo` Teacher (User).
+- **ModuleResource** (or ContentResource):
+    - **Fields**:
+        - Class ID (Select, Filterable)
+        - Title (Text)
+        - Type (Select: Video, PDF, Quiz, Text)
+        - Content (RichEditor or FileUpload)
+        - Duration (Number, minutes)
+        - Sort Order (Number)
+
+## 3. Hero AI & Assessments
+### Resources
+- **AssessmentResultResource**:
+    - **Purpose**: View-only resource to monitor AI assessment results.
+    - **Fields**:
+        - User (Relation)
+        - Type (Select: VAK, SWOT, RIASEC, MULTIPLE_INTELLIGENCE)
+        - Result Data (KeyValue or JSON View) - stores the raw AI findings.
+        - Created At (DateTime)
+    - **Widgets**: Charts showing distribution of Learning Styles (VAK) across all students.
+
+## 4. Try Out / Exams (Future)
+### Resources
+- **ExamResource**:
+    - **Fields**: Title, Description, Duration, Passing Grade.
+    - **Relations**: `hasMany` Questions.
+- **QuestionResource**:
+    - **Fields**: Question Text, Type (Multiple Choice, Essay), Options (Repeater), Correct Answer.
+
+## Implementation Notes
+- Use **Filament Panels** to separate logic:
+    - `/admin`: Super Admin & Staff.
+    - `/teacher`: Teachers managing their classes.
+    - `/student`: (Optional) If not using custom Blade/Livewire frontend for dashboard.
+- **Theme**: Register a custom Filament theme to use the primary color `#DC2626` (Red-600).
+- **Navigation**: Group resources by "LMS", "Users", and "Analytics".
